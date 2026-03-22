@@ -1,88 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>LoanHub - Instant Loan</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>LoanHub - Smart Loan</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* HEADER */
+header {
+  background: #111827;
+  color: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+}
+
+/* HERO */
+.hero {
+  height: 80vh;
+  background: linear-gradient(to right, #2563eb, #1e40af);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.btn {
+  background: white;
+  color: #2563eb;
+  padding: 12px 25px;
+  text-decoration: none;
+  margin-top: 20px;
+  display: inline-block;
+  border-radius: 5px;
+}
+
+/* EMI */
+#emi {
+  padding: 60px;
+  background: linear-gradient(to right, #1e3a8a, #2563eb);
+  color: white;
+  text-align: center;
+}
+
+.emi-card {
+  max-width: 450px;
+  margin: auto;
+  padding: 25px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
+}
+
+.emi-card input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: none;
+}
+
+.emi-card button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+
+canvas {
+  margin-top: 20px;
+}
+
+/* WHATSAPP */
+.whatsapp {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: white;
+  font-size: 24px;
+  padding: 15px;
+  border-radius: 50%;
+  text-decoration: none;
+}
+
+/* FOOTER */
+footer {
+  background: #111827;
+  color: white;
+  text-align: center;
+  padding: 15px;
+}
+</style>
+
 </head>
 <body>
 
 <header>
-  <h1>LoanHub 💸</h1>
+  <h2>LoanHub 💸</h2>
   <nav>
     <a href="#">Home</a>
-    <a href="#loans">Loans</a>
-    <a href="#apply">Apply</a>
+    <a href="#emi">Calculator</a>
   </nav>
 </header>
 
 <section class="hero">
-  <div class="overlay">
-    <h2>Instant Loan Approval</h2>
-    <p>Trusted by 10,000+ Customers</p>
-    <a href="#apply" class="btn">Apply Now</a>
+  <div>
+    <h1>Smart Loan Calculator</h1>
+    <p>Check EMI, Eligibility & Get Loan Instantly</p>
+    <a href="#emi" class="btn">Start Now</a>
   </div>
 </section>
 
-<section id="loans">
-  <h2>Our Loan Services</h2>
+<section id="emi">
+  <h2>EMI Calculator 💰</h2>
 
-  <div class="cards">
-    <div class="card">
-      <h3>🏠 Home Loan</h3>
-      <p>Low Interest Rates</p>
-    </div>
+  <div class="emi-card">
 
-    <div class="card">
-      <h3>🚗 Car Loan</h3>
-      <p>Quick Approval</p>
-    </div>
+    <input type="number" id="amount" placeholder="Loan Amount (₹)">
+    <input type="number" id="rate" placeholder="Interest Rate (%)">
+    <input type="number" id="months" placeholder="Tenure (Months)">
+    <input type="number" id="income" placeholder="Monthly Income (₹)">
 
-    <div class="card">
-      <h3>💼 Personal Loan</h3>
-      <p>No Collateral</p>
-    </div>
+    <button onclick="calculateEMI()">Calculate</button>
 
-    <div class="card">
-      <h3>🎓 Education Loan</h3>
-      <p>Study Support</p>
-    </div>
+    <h3 id="result"></h3>
+    <p id="suggestion"></p>
+    <p id="score"></p>
 
-    <div class="card">
-      <h3>🏢 Property Loan</h3>
-      <p>Loan Against Property</p>
-    </div>
+    <canvas id="pieChart"></canvas>
+    <canvas id="lineChart"></canvas>
+
   </div>
 </section>
 
-<section id="apply">
-  <h2>Apply for Loan</h2>
-
-  <form>
-    <input type="text" placeholder="Full Name" required>
-    <input type="text" placeholder="Phone Number" required>
-    <input type="email" placeholder="Email">
-
-    <select>
-      <option>Select Loan Type</option>
-      <option>Home Loan</option>
-      <option>Car Loan</option>
-      <option>Personal Loan</option>
-      <option>Education Loan</option>
-    </select>
-
-    <input type="number" placeholder="Loan Amount">
-
-    <button type="submit">Submit</button>
-  </form>
-</section>
-
-<!-- WhatsApp Button -->
-<a href="https://wa.me/91XXXXXXXXXX" class="whatsapp">💬</a>
+<a href="#" class="whatsapp" onclick="sendToWhatsApp()">💬</a>
 
 <footer>
   <p>© 2026 LoanHub</p>
 </footer>
+
+<script>
+let pieChart, lineChart;
+
+function calculateEMI() {
+  let P = +document.getElementById("amount").value;
+  let r = +document.getElementById("rate").value / 12 / 100;
+  let n = +document.getElementById("months").value;
+  let income = +document.getElementById("income").value;
+
+  let emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  let total = emi * n;
+  let interest = total - P;
+
+  document.getElementById("result").innerText =
+    "Monthly EMI: ₹ " + emi.toFixed(0);
+
+  if (emi > income * 0.5) {
+    document.getElementById("suggestion").innerText =
+      "⚠️ EMI too high! Try lower loan or longer tenure";
+  } else {
+    document.getElementById("suggestion").innerText =
+      "✅ Good choice! Loan is manageable";
+  }
+
+  let score = Math.min(100, Math.max(0, 100 - (emi / income) * 100));
+  document.getElementById("score").innerText =
+    "Eligibility Score: " + score.toFixed(0) + "/100";
+
+  if (pieChart) pieChart.destroy();
+
+  pieChart = new Chart(document.getElementById("pieChart"), {
+    type: "pie",
+    data: {
+      labels: ["Principal", "Interest"],
+      datasets: [{
+        data: [P, interest],
+        backgroundColor: ["#22c55e", "#ef4444"]
+      }]
+    }
+  });
+
+  let emiArray = Array(n).fill(emi);
+
+  if (lineChart) lineChart.destroy();
+
+  lineChart = new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+      labels: Array.from({length: n}, (_, i) => i + 1),
+      datasets: [{
+        label: "EMI",
+        data: emiArray,
+        borderColor: "#22c55e"
+      }]
+    }
+  });
+}
+
+function sendToWhatsApp() {
+  let amount = document.getElementById("amount").value;
+  let loan = "Loan Inquiry";
+
+  let message = `Hello, I want a loan.%0AAmount: ${amount}`;
+
+  let url = "https://wa.me/91XXXXXXXXXX?text=" + message;
+
+  window.open(url, '_blank');
+}
+</script>
 
 </body>
 </html>
