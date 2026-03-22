@@ -9,16 +9,21 @@
 <style>
 body {
   margin: 0;
+  padding-top: 70px;
   font-family: 'Segoe UI', sans-serif;
 }
 
 /* HEADER */
 header {
+  position: fixed;
+  top: 0;
+  width: 100%;
   background: #111827;
   color: white;
   padding: 15px 30px;
   display: flex;
   justify-content: space-between;
+  z-index: 1000;
 }
 
 nav a {
@@ -29,13 +34,22 @@ nav a {
 
 /* HERO */
 .hero {
-  height: 80vh;
+  height: 60vh;
   background: linear-gradient(to right, #2563eb, #1e40af);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding: 40px 20px;
+}
+
+.hero h1 {
+  font-size: 36px;
+}
+
+.hero p {
+  font-size: 18px;
 }
 
 .btn {
@@ -50,15 +64,16 @@ nav a {
 
 /* EMI */
 #emi {
-  padding: 60px;
+  padding: 40px 20px;
+  margin-top: -40px;
   background: linear-gradient(to right, #1e3a8a, #2563eb);
   color: white;
   text-align: center;
 }
 
 .emi-card {
-  max-width: 450px;
-  margin: auto;
+  max-width: 380px;
+  margin: 20px auto;
   padding: 25px;
   border-radius: 15px;
   background: rgba(255,255,255,0.1);
@@ -94,8 +109,8 @@ canvas {
   right: 20px;
   background: #25D366;
   color: white;
-  font-size: 24px;
-  padding: 15px;
+  font-size: 22px;
+  padding: 14px;
   border-radius: 50%;
   text-decoration: none;
 }
@@ -166,6 +181,9 @@ function calculateEMI() {
   let income = +document.getElementById("income").value;
 
   let emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+  if (!emi) return;
+
   let total = emi * n;
   let interest = total - P;
 
@@ -215,8 +233,7 @@ function calculateEMI() {
 }
 
 function sendToWhatsApp() {
-  let amount = document.getElementById("amount").value;
-  let loan = "Loan Inquiry";
+  let amount = document.getElementById("amount").value || "Not entered";
 
   let message = `Hello, I want a loan.%0AAmount: ${amount}`;
 
